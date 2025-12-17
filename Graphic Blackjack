@@ -1,0 +1,166 @@
+import random
+import os
+
+SUITS = ['♥', '♦', '♣', '♠']          # All four suits
+RANKS = ['2', '3', '4', '5', '6', '7',
+         '8', '9', '10', 'J', 'Q', 'K', 'A']  # Card ranks
+
+
+def clear():
+    """Clear the terminal screen."""
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
+def make_deck():
+    """Create a standard 52‑card deck as strings like 'A♠'."""
+    return [f"{r}{s}" for s in SUITS for r in RANKS]
+
+
+def card_value(card):
+    """Return blackjack value of a single card."""
+    r = card[:-1]  # everything except last char (suit)
+    if r in ['J', 'Q', 'K']:
+        return 10
+    if r == 'A':
+        return 11
+    return int(r)
+
+
+def hand_total(hand):
+    """Return best blackjack total for a hand, handling aces as 1 or 11."""
+    total = sum(card_value(c) for c in hand)
+    aces = sum(1 for c in hand if c[:-1] == 'A')
+    # Downgrade aces from 11 to 1 while busting
+    while total > 21 and aces:
+        total -= 10
+        aces -= 1
+    return total
+
+
+def draw_cards_ascii(cards, hide_first=False):
+    """
+    Return multi‑line ASCII art for a list of cards.
+    If hide_first is True, first card is shown face down.
+    """
+    top = []
+    mid1 = []
+    mid2 = []
+    mid3 = []
+    bot = []
+
+    for i, c in enumerate(cards):
+        # Draw a back for the first card if hidden
+        if hide_first and i == 0:
+            top.append("┌─────────┐")
+            mid1.append("│░░░░░░░░░│")
+            mid2.append("│░░░░░░░░░│")
+            mid3.append("│░░░░░░░░░│")
+            bot.append("└─────────┘")
+            continue
+
+        rank = c[:-1]   # rank part (e.g. '10', 'K')
+        suit = c[-1]    # last char is suit
+        r_left = rank.ljust(2)[:2]   # left‑aligned rank
+        r_right = rank.rjust(2)[-2:] # right‑aligned rank
+
+        top.append("┌─────────┐")
+        mid1.append(f"│{r_left}       │")
+        mid2.append(f"│    {suit}    │")
+        mid3.append(f"│       {r_right}│")
+        bot.append("└─────────┘")
+
+    # Join all card pieces horizontally
+    lines = [
+        " ".join(top),
+        " ".join(mid1),
+        " ".join(mid2),
+        " ".join(mid3),
+        " ".join(bot),
+    ]
+    return "\n".join(lines)
+
+
+def show_table(player, dealer, hide_dealer=True):
+    """Clear screen and print dealer and player hands."""
+    clear()
+    print("=== BLACKJACK ===\n")
+
+    # Dealer hand
+    if hide_dealer:
+        print("Dealer:")
+        print(draw_cards_ascii(dealer, hide_first=True))
+        print("Total: ??\n")  # hide dealer total
+    else:
+        print(f"Dealer: ({hand_total(dealer)})")
+        print(draw_cards_ascii(dealer))
+        print()
+
+    # Player hand
+    print(f"Player: ({hand_total(player)})")
+    print(draw_cards_ascii(player))
+    print()
+
+
+def main():
+    """Main game loop."""
+    while True:
+        # Create and shuffle a fresh deck
+        deck = make_deck()
+        random.shuffle(deck)
+
+        # Initial deal: 2 cards each
+        player = [deck.pop(), deck.pop()]
+        dealer = [deck.pop(), deck.pop()]
+
+        # Player turn
+        while True:
+            show_table(player, dealer, hide_dealer=True)
+
+            if hand_total(player) == 21:
+                print("Blackjack!")
+                break
+
+            if hand_total(player) > 21:
+                print("You bust!")
+                break
+
+            move = input("Hit or stand? (h/s): ").lower().strip()
+            if move == 'h':
+                # Give player another card
+                player.append(deck.pop())
+            elif move == 's':
+                # End player turn
+                break
+
+        # Dealer turn only if player did not bust
+        if hand_total(player) <= 21:
+            # Dealer must hit until 17 or more
+            while hand_total(dealer) < 17:
+                show_table(player, dealer, hide_dealer=False)
+                input("Dealer hits... (press Enter)")
+                dealer.append(deck.pop())
+
+        # Final reveal and outcome
+        show_table(player, dealer, hide_dealer=False)
+
+        p = hand_total(player)
+        d = hand_total(dealer)
+
+        if p > 21:
+            print("You bust, dealer wins.")
+        elif d > 21:
+            print("Dealer busts, you win!")
+        elif p > d:
+            print("You win!")
+        elif p < d:
+            print("Dealer wins.")
+        else:
+            print("Push (tie).")
+
+        # Ask to play again
+        if input("\nPlay again? (y/n): ").lower().strip() != 'y':
+            break
+
+
+if __name__ == "__main__":
+    main()
