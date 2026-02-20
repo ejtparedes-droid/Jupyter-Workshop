@@ -53,22 +53,3 @@ class VIPAccount(BankAccount):
             print("Transaction denied")
             return
         self.__balance = projected_balance  # Direct internal update
-
-
-# Test code (remove for submission)
-if __name__ == "__main__":
-    acc1 = BankAccount("Alice")
-    acc1.deposit(1000)
-    acc1.withdraw(500)
-    print(f"Account 1 balance: {acc1.get_balance()}")
-    print(f"Total accounts: {BankAccount.total_accounts}")
-
-    savings = SavingsAccount("Bob", 0.05)
-    savings.deposit(1000)
-    savings.apply_interest()
-    print(f"Savings balance: {savings.get_balance()}")
-
-    vip = VIPAccount("Charlie")
-    vip.deposit(500)
-    vip.withdraw(800)
-    print(f"VIP balance: {vip.get_balance()}")
