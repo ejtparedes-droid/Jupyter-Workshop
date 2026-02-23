@@ -1,0 +1,20 @@
+What is a class in Python?,A blueprint for creating objects that bundles data (attributes) and behavior (methods)
+What is an object?,An instance of a class — a concrete realization of the blueprint
+What is encapsulation?,Bundling data and methods together and restricting direct access to some components
+What is inheritance?,A mechanism where a child class acquires attributes and methods from a parent class
+What is polymorphism?,The ability of different objects to respond to the same method call in their own way
+What is composition?,Building complex objects by combining simpler objects (has-a relationship)
+What is the __init__ method?,The constructor — called automatically when a new object is created
+What is self in Python?,A reference to the current instance of the class
+What is abstraction?,Hiding complex implementation details and exposing only the necessary interface
+What does DRY stand for?,Don't Repeat Yourself — a principle to reduce code duplication
+What is a method?,A function defined inside a class that operates on the object's data
+What is an attribute?,A variable that belongs to an object or class
+What is the Forgetting Curve?,Hermann Ebbinghaus's model showing how memory decays exponentially over time without review
+What is spaced repetition?,A learning technique that increases review intervals as material is better learned
+What is separation of concerns?,A design principle that divides a program into distinct sections each handling a specific concern
+What is st.session_state in Streamlit?,A dictionary-like object that persists data across reruns of a Streamlit app
+What does CSV stand for?,Comma-Separated Values — a plain-text file format for tabular data
+What is a list comprehension?,A concise way to create lists: [expression for item in iterable if condition]
+What is the modulo operator (%)?,Returns the remainder of a division — used here for looping the card index
+What is random.shuffle()?,A Python function that shuffles a list in place using the Fisher-Yates algorithm

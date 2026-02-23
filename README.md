@@ -1,78 +1,75 @@
-# Python Classwork Jupyter Notebooks
+# 🃏 FlashCard Machine
 
-# Overview
-> Comprehensive collection of Jupyter notebooks from Python programming coursework, covering fundamentals through advanced data analysis and visualization projects.
+A Streamlit web app that combats the Forgetting Curve using spaced repetition flashcards.
 
-*Notebooks include detailed explanations, progressive coding exercises, complete working examples, data visualizations, and solutions to class assignments.*
+---
 
-**Quick Start:** `git clone` → `pip install -r requirements.txt` → `jupyter notebook`
+## Project Structure
 
-`master` branch contains all current coursework notebooks organized by topic and difficulty.
+```
+flashCards/
+├── flashcard.py      # The "Brick" — Flashcard class
+├── deck.py           # The "Manager" — Deck class (Composition)
+├── main.py           # The "Face" — Streamlit frontend
+├── flashcards.csv    # Study data (headerless: question,answer)
+└── README.md
+```
 
-## Contents
+---
 
-| Topic | Notebook | Description |
-|-------|----------|-------------|
-| `Python Basics` | `01_python_basics.ipynb` | Variables, data types, loops, conditionals, functions, error handling |
-| `Data Structures` | `02_data_structures.ipynb` | Lists, dictionaries, sets, tuples, comprehensions, sorting algorithms |
-| `NumPy` | `03_numpy.ipynb` | Arrays, vectorized operations, broadcasting, linear algebra, random sampling |
-| `Pandas` | `04_pandas.ipynb` | DataFrames, Series, data loading/cleaning, grouping, merging, pivot tables |
-| `Visualization` | `05_plots.ipynb` | Matplotlib, seaborn, statistical plots, subplots, custom styling |
-| `File I/O` | `06_file_io.ipynb` | CSV/JSON/Excel reading/writing, text processing, data pipelines |
-| `OOP Basics` | `07_oop.ipynb` | Classes, inheritance, encapsulation, polymorphism, magic methods |
-| `Projects` | `08_projects.ipynb` | Complete analysis workflows, data science case studies |
+## Quick Start
 
-## Setup
+```bash
+# 1. Install dependencies
+pip install streamlit
 
-git clone https://github.com/yourusername/python-classwork-notebooks.git
+# 2. Run the app
+streamlit run main.py
+```
 
-cd python-classwork-notebooks
+Open `http://localhost:8501` in your browser.
 
-python -m venv venv
+---
 
-source venv/bin/activate # Windows: venv\Scripts\activate
+## Architecture (Separation of Concerns)
 
-pip install -r requirements.txt
+| Layer | File | Responsibility |
+|-------|------|---------------|
+| Data | `flashcards.csv` | Raw study material |
+| Logic | `flashcard.py` + `deck.py` | OOP backend |
+| Interface | `main.py` | Streamlit UI |
 
-jupyter notebook
+---
 
-text
+## Implementation Checklist
 
-## Requirements
+- ✅ **Data Load** — All CSV rows appear in the app via `Deck._load()`
+- ✅ **Persistence** — `st.session_state` stores the Deck object across button clicks
+- ✅ **Logic** — `Flip` calls `card.flip()` which returns `card.answer`
+- ✅ **Looping** — `next_card()` uses modulo (`%`) to wrap after the last card
 
-jupyter==1.0.0
+---
 
-numpy==1.26.4
+## OOP Evaluation Q&A
 
-pandas==2.2.2
+### 1. What is a Class, and how is it different from an Object?
+A **class** is a blueprint — it defines the structure and behaviour that objects of that type will have. An **object** is a concrete *instance* of that class: the blueprint turned into something real that occupies memory and holds its own data.  
+*In this project:* `Flashcard` is the class; `Flashcard("What is OOP?", "A paradigm…")` is an object.
 
-matplotlib==3.9.2
+### 2. What are Attributes and Methods?
+**Attributes** are variables bound to an object — they store its state (`self.question`, `self.answer`).  
+**Methods** are functions defined inside a class that operate on that state (`flip()`, `shuffle()`).
 
-seaborn==0.13.2
+### 3. What is Composition, and how did you use it?
+**Composition** is a "has-a" relationship: one class owns instances of another class rather than inheriting from it.  
+`Deck` *has a* list of `Flashcard` objects — it composes `Flashcard` without extending it. This keeps the two classes independently changeable and testable.
 
-scipy==1.13.1
+### 4. What is Encapsulation?
+Encapsulation bundles data and the methods that act on it inside a class, hiding internal details from outside code.  
+`Deck._load()` is a private helper (prefixed `_`) — callers use `Deck` without knowing how CSV parsing works.
 
-openpyxl==3.1.2
+### 5. Why did you use `st.session_state`?
+Streamlit reruns the entire script on every user interaction. Without `session_state`, a new `Deck` would be created each time a button is clicked, losing the shuffle order and the current index. Storing the `Deck` object in `st.session_state` gives it **persistence** across reruns.
 
-text
-
-## Usage
-
-Open any `.ipynb` file in Jupyter Notebook. Each notebook is self-contained and includes:
-
-| Feature | Description |
-|---------|-------------|
-| **Progressive Exercises** | Start simple, build to complex problems |
-| **Detailed Explanations** | Concepts explained with examples |
-| **Data Visualizations** | Charts/graphs showing results |
-| **Complete Solutions** | Working code for all assignments |
-| **Practice Problems** | Additional challenges for mastery |
-
-## Learning Path
-
-1. **01_python_basics.ipynb** - Build programming foundation
-2. **02_data_structures.ipynb** - Master Python collections
-3. **03_numpy.ipynb** - Numerical computing essentials
-4. **04_pandas.ipynb** - Data manipulation powerhouse
-5. **05_plots.ipynb** - Professional data visualization
-6. **06-08** - Apply skills to real projects
+### 6. How does the deck loop back to the first card?
+`next_card()` computes the new index as `(current_index + 1) % len(cards)`. The modulo operator (`%`) returns the remainder after division, so when `current_index` reaches the last position, the remainder is `0` — wrapping back to the first card automatically.
